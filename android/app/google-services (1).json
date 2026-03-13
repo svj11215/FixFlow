@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "704590445192",
+    "project_id": "fixflow-dc246",
+    "storage_bucket": "fixflow-dc246.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:704590445192:android:cc985bd0e5e5a67bc07d3d",
+        "android_client_info": {
+          "package_name": "com.example.fixflow"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "704590445192-19h98dovemrgl4dlgt25i25ok814j4f6.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.fixflow",
+            "certificate_hash": "c5152d4e6c5b3d927e2379675eb92617ffe98179"
+          }
+        },
+        {
+          "client_id": "704590445192-v6u1ps29du45hi81bbaq1up306hb7fmg.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAcY-rhSymWE5d5Cz2geNUTZ-VLMk8a8N4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "704590445192-v6u1ps29du45hi81bbaq1up306hb7fmg.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
