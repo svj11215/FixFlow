@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../models/complaint_model.dart';
 import '../utils/constants.dart';
 import '../utils/helpers.dart';
+import 'complaint_image_widget.dart';
 import 'status_chip.dart';
 
 class ComplaintCard extends StatelessWidget {
@@ -149,6 +150,10 @@ class ComplaintCard extends StatelessWidget {
                   ],
                 ),
               ),
+            ],
+            if (complaint.imageUrl.isNotEmpty) ...[
+              const SizedBox(height: 10),
+              ComplaintImageWidget(imageUrl: complaint.imageUrl),
             ],
             if (!isAdmin && onDelete != null) ...[
               const SizedBox(height: 8),

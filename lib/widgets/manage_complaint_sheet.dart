@@ -1,8 +1,8 @@
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import '../models/complaint_model.dart';
 import '../utils/constants.dart';
 import '../utils/helpers.dart';
+import 'complaint_image_widget.dart';
 
 class ManageComplaintSheet extends StatefulWidget {
   final ComplaintModel complaint;
@@ -88,27 +88,7 @@ class _ManageComplaintSheetState extends State<ManageComplaintSheet> {
                 ),
               ),
               const SizedBox(height: 8),
-              ClipRRect(
-                borderRadius: BorderRadius.circular(12),
-                child: CachedNetworkImage(
-                  imageUrl: widget.complaint.imageUrl,
-                  height: 200,
-                  width: double.infinity,
-                  fit: BoxFit.cover,
-                  placeholder: (context, url) => Container(
-                    height: 200,
-                    color: AppColors.background,
-                    child: const Center(child: CircularProgressIndicator()),
-                  ),
-                  errorWidget: (context, url, error) => Container(
-                    height: 200,
-                    color: AppColors.background,
-                    child: const Center(
-                      child: Icon(Icons.broken_image, color: AppColors.error),
-                    ),
-                  ),
-                ),
-              ),
+              ComplaintImageWidget(imageUrl: widget.complaint.imageUrl),
             ],
             const SizedBox(height: 20),
             const Text(

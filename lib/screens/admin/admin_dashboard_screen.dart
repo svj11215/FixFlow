@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import '../../models/complaint_model.dart';
 import '../../providers/auth_provider.dart';
@@ -35,22 +36,25 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
         centerTitle: true,
         elevation: 0,
         actions: [
-          IconButton(
-            onPressed: () {
-              Navigator.pushNamed(context, '/admin/profile');
-            },
-            icon: CircleAvatar(
-              radius: 16,
-              backgroundColor: Colors.white.withValues(alpha: 0.2),
-              backgroundImage: authProvider.currentUser?.photoURL != null
-                  ? NetworkImage(authProvider.currentUser!.photoURL!)
-                  : null,
-              child: authProvider.currentUser?.photoURL == null
-                  ? const Icon(Icons.person, color: Colors.white, size: 18)
-                  : null,
+          Padding(
+            padding: const EdgeInsets.only(right: 12),
+            child: GestureDetector(
+              onTap: () => context.push('/admin/profile'),
+              child: CircleAvatar(
+                radius: 18,
+                backgroundImage:
+                    context.read<AuthProvider>().currentUser?.photoURL != null
+                    ? NetworkImage(
+                        context.read<AuthProvider>().currentUser!.photoURL!,
+                      )
+                    : null,
+                child:
+                    context.read<AuthProvider>().currentUser?.photoURL == null
+                    ? const Icon(Icons.person, size: 18)
+                    : null,
+              ),
             ),
           ),
-          const SizedBox(width: 8),
         ],
       ),
       body: Center(
@@ -83,8 +87,8 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
               final filteredComplaints = _statusFilter == 'All'
                   ? allComplaints
                   : allComplaints
-                      .where((c) => c.status == _statusFilter)
-                      .toList();
+                        .where((c) => c.status == _statusFilter)
+                        .toList();
 
               return Column(
                 children: [
@@ -121,7 +125,9 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
                     padding: const EdgeInsets.symmetric(horizontal: 16),
                     child: Container(
                       padding: const EdgeInsets.symmetric(
-                          horizontal: 16, vertical: 4),
+                        horizontal: 16,
+                        vertical: 4,
+                      ),
                       decoration: BoxDecoration(
                         color: AppColors.surface,
                         borderRadius: BorderRadius.circular(8),
@@ -155,8 +161,11 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
                             child: Column(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
-                                Icon(Icons.inbox_outlined,
-                                    size: 48, color: Colors.grey[300]),
+                                Icon(
+                                  Icons.inbox_outlined,
+                                  size: 48,
+                                  color: Colors.grey[300],
+                                ),
                                 const SizedBox(height: 12),
                                 Text(
                                   _statusFilter == 'All'
