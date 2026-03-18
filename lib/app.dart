@@ -4,10 +4,10 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'providers/auth_provider.dart';
 import 'screens/about_screen.dart';
-import 'screens/admin/admin_dashboard_screen.dart';
-import 'screens/admin/admin_profile_screen.dart';
-import 'screens/auth/login_screen.dart';
 import 'screens/user/user_home_screen.dart';
+import 'screens/admin/admin_home_screen.dart';
+import 'screens/auth/login_screen.dart';
+import 'screens/splash_screen.dart';
 import 'utils/constants.dart';
 
 class FixFlowApp extends StatelessWidget {
@@ -21,15 +21,21 @@ class FixFlowApp extends StatelessWidget {
       initialLocation: '/',
       refreshListenable: authProvider,
       redirect: (context, state) {
+        if (state.uri.path == '/admin/dashboard') return '/admin';
+        if (state.uri.path == '/admin/profile') return '/admin';
+
         final isAuthenticated = authProvider.isAuthenticated;
         final isLoading = authProvider.isLoading;
-        final isLoginRoute = state.matchedLocation == '/';
+        final isSplashRoute = state.matchedLocation == '/';
+        final isLoginRoute = state.matchedLocation == '/login';
+
+        if (isSplashRoute) return null; // Let splash screen handle the delay
 
         if (isLoading) return null;
 
-        if (!isAuthenticated && !isLoginRoute) return '/';
+        if (!isAuthenticated && !isLoginRoute) return '/login';
         if (isAuthenticated && isLoginRoute) {
-          return authProvider.isAdmin ? '/admin/dashboard' : '/user/home';
+          return authProvider.isAdmin ? '/admin' : '/user/home';
         }
 
         // Guard admin routes
@@ -41,7 +47,7 @@ class FixFlowApp extends StatelessWidget {
         // Guard user routes
         if (state.matchedLocation.startsWith('/user') &&
             authProvider.isAdmin) {
-          return '/admin/dashboard';
+          return '/admin';
         }
 
         return null;
@@ -49,6 +55,10 @@ class FixFlowApp extends StatelessWidget {
       routes: [
         GoRoute(
           path: '/',
+          builder: (context, state) => const SplashScreen(),
+        ),
+        GoRoute(
+          path: '/login',
           builder: (context, state) => const LoginScreen(),
         ),
         GoRoute(
@@ -56,18 +66,31 @@ class FixFlowApp extends StatelessWidget {
           builder: (context, state) => const UserHomeScreen(),
         ),
         GoRoute(
-          path: '/admin/dashboard',
-          builder: (context, state) => const AdminDashboardScreen(),
-        ),
-        GoRoute(
-          path: '/admin/profile',
-          builder: (context, state) => const AdminProfileScreen(),
+          path: '/admin',
+          builder: (context, state) => const AdminHomeScreen(),
         ),
         GoRoute(
           path: '/about',
           builder: (context, state) => const AboutScreen(),
         ),
       ],
+      errorBuilder: (context, state) => Scaffold(
+        body: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              const Icon(Icons.error_outline, size: 64, color: Colors.grey),
+              const SizedBox(height: 16),
+              const Text('Page not found', style: TextStyle(fontSize: 18)),
+              const SizedBox(height: 16),
+              ElevatedButton(
+                onPressed: () => context.go('/'),
+                child: const Text('Go to Login'),
+              ),
+            ],
+          ),
+        ),
+      ),
     );
 
     return MaterialApp.router(

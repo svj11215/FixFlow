@@ -2,13 +2,21 @@ import 'package:flutter/material.dart';
 
 class AppColors {
   static const Color primary = Color(0xFF2563EB);
+  static const Color primaryDark = Color(0xFF1D4ED8);
+  static const Color primaryLight = Color(0xFFEFF6FF);
+  static const Color accentTeal = Color(0xFF0EA5E9);
   static const Color secondary = Color(0xFF10B981);
   static const Color warning = Color(0xFFF59E0B);
   static const Color error = Color(0xFFEF4444);
+  static const Color rejected = Color(0xFFEC4899);
   static const Color background = Color(0xFFF8FAFC);
   static const Color surface = Color(0xFFFFFFFF);
-  static const Color textPrimary = Color(0xFF1E293B);
+  static const Color borderLight = Color(0xFFE2E8F0);
+  static const Color textPrimary = Color(0xFF0F172A);
   static const Color textSecondary = Color(0xFF64748B);
+  static const Color textMuted = Color(0xFF94A3B8);
+  static const Color gradientStart = Color(0xFF2563EB);
+  static const Color gradientEnd = Color(0xFF0EA5E9);
 
   static Color statusColor(String status) {
     switch (status) {
@@ -52,22 +60,45 @@ class AppCategories {
     'Cleanliness',
     'Other',
   ];
+
+  static Color categoryColor(String category) {
+    switch (category) {
+      case 'Electrical':
+        return Colors.yellow.shade700;
+      case 'Plumbing':
+        return Colors.blue;
+      case 'Internet':
+        return Colors.purple;
+      case 'Maintenance':
+        return Colors.orange;
+      case 'Cleanliness':
+        return Colors.green;
+      case 'Other':
+      default:
+        return Colors.grey;
+    }
+  }
 }
 
 class AppStatuses {
+  static const String pending = 'Pending';
+  static const String inProgress = 'In Progress';
+  static const String resolved = 'Resolved';
+  static const String rejected = 'Rejected';
+
   static const List<String> statuses = [
-    'Pending',
-    'In Progress',
-    'Resolved',
-    'Rejected',
+    pending,
+    inProgress,
+    resolved,
+    rejected,
   ];
 
   static const List<String> filterStatuses = [
     'All',
-    'Pending',
-    'In Progress',
-    'Resolved',
-    'Rejected',
+    pending,
+    inProgress,
+    resolved,
+    rejected,
   ];
 }
 

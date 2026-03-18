@@ -18,10 +18,21 @@ class AuthService {
         // Use Firebase Auth's GoogleAuthProvider on web to bypass the
         // google_sign_in_web package's inherent People API dependency.
         GoogleAuthProvider authProvider = GoogleAuthProvider();
+        
+        // Force account picker on web
+        authProvider.setCustomParameters({
+          'prompt': 'select_account'
+        });
+        
         final userCredential = await _auth.signInWithPopup(authProvider);
         return userCredential.user;
       } else {
         // Fallback for native platforms
+        
+        // Sign out of any cached Google session first to force account picker
+        await _googleSignIn.signOut();
+        
+        // Now sign in fresh
         final GoogleSignInAccount? googleUser = await _googleSignIn.signIn();
         if (googleUser == null) return null;
 
