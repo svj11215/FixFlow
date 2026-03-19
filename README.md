@@ -1,33 +1,110 @@
 <div align="center">
 
+<img src="https://capsule-render.vercel.app/api?type=waving&color=0:0d0d1a,30:1a0533,60:0a1628,100:0d0d1a&height=240&section=header&text=FixFlow&fontSize=86&fontColor=ffffff&fontAlignY=40&fontAlign=50&desc=Complaint%20Management%2C%20Reimagined&descSize=17&descAlignY=62&descAlign=50&animation=fadeIn&stroke=6c47ff&strokeWidth=2" width="100%"/>
+
 <br/>
 
-```
- ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
- ░                                                             ░
- ░    ███████╗██╗██╗  ██╗███████╗██╗      ██████╗ ██╗    ██╗  ░
- ░    ██╔════╝██║╚██╗██╔╝██╔════╝██║     ██╔═══██╗██║    ██║  ░
- ░    █████╗  ██║ ╚███╔╝ █████╗  ██║     ██║   ██║██║ █╗ ██║  ░
- ░    ██╔══╝  ██║ ██╔██╗ ██╔══╝  ██║     ██║   ██║██║███╗██║  ░
- ░    ██║     ██║██╔╝ ██╗██║     ███████╗╚██████╔╝╚███╔███╔╝  ░
- ░    ╚═╝     ╚═╝╚═╝  ╚═╝╚═╝     ╚══════╝ ╚═════╝  ╚══╝╚══╝  ░
- ░                                                             ░
- ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
-```
-
-### 🔗 **[Live Demo → fixflow-dc246.web.app](https://fixflow-dc246.web.app/)**
+[![Typing SVG](https://readme-typing-svg.demolab.com?font=JetBrains+Mono&weight=700&size=18&duration=2800&pause=1200&color=6C47FF&center=true&vCenter=true&multiline=true&width=600&height=54&lines=Submit+·+Track+·+Resolve;Real-time+·+Role-based+·+Transparent)](https://fixflow-dc246.web.app/)
 
 <br/>
 
 [![Flutter](https://img.shields.io/badge/Flutter-02569B?style=for-the-badge&logo=flutter&logoColor=white)](https://flutter.dev)
-[![Firebase](https://img.shields.io/badge/Firebase-FF6F00?style=for-the-badge&logo=firebase&logoColor=white)](https://firebase.google.com)
 [![Dart](https://img.shields.io/badge/Dart-0175C2?style=for-the-badge&logo=dart&logoColor=white)](https://dart.dev)
+[![Firebase](https://img.shields.io/badge/Firebase-FF6F00?style=for-the-badge&logo=firebase&logoColor=white)](https://firebase.google.com)
 [![Cloudinary](https://img.shields.io/badge/Cloudinary-3448C5?style=for-the-badge&logo=cloudinary&logoColor=white)](https://cloudinary.com)
 
-[![Version](https://img.shields.io/badge/Version-1.0.0-blueviolet?style=flat-square)](https://fixflow-dc246.web.app/)
-[![Status](https://img.shields.io/badge/Status-Live-brightgreen?style=flat-square)](https://fixflow-dc246.web.app/)
-[![Platform](https://img.shields.io/badge/Platform-iOS%20%7C%20Android%20%7C%20Web-lightgrey?style=flat-square)](https://fixflow-dc246.web.app/)
-[![License](https://img.shields.io/badge/License-MIT-blue?style=flat-square)](LICENSE)
+<br/>
+
+[![Live Demo](https://img.shields.io/badge/%F0%9F%9F%A2%20LIVE-fixflow--dc246.web.app-22c55e?style=for-the-badge)](https://fixflow-dc246.web.app/)
+[![Version](https://img.shields.io/badge/Version-1.0.0-8b5cf6?style=for-the-badge)](#)
+[![Platform](https://img.shields.io/badge/iOS%20%7C%20Android%20%7C%20Web-0ea5e9?style=for-the-badge)](#)
+
+</div>
+
+## 👤 User Features &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 🛡️ Admin Features
+
+<table>
+<tr>
+<td width="50%" valign="top">
+
+```
+┌─────────────────────────────────┐
+│  👤  USER  PANEL                │
+├─────────────────────────────────┤
+│                                 │
+│  🔐  Google Sign-In SSO         │
+│      Firebase Auth · No pwd     │
+│                                 │
+│  📝  Smart Complaint Form       │
+│      Title · Category · Loc     │
+│                                 │
+│  📸  Image Attachments          │
+│      Cloudinary CDN upload      │
+│                                 │
+│  📡  Realtime Status Feed       │
+│      Firestore live streams     │
+│                                 │
+│  🗒️  Resolution Notes           │
+│      Admin commentary visible   │
+│                                 │
+│  🗑️  Delete Pending Items       │
+│      Full complaint history     │
+│                                 │
+└─────────────────────────────────┘
+```
+
+</td>
+<td width="50%" valign="top">
+
+```
+┌─────────────────────────────────┐
+│  🛡️  ADMIN  PANEL               │
+├─────────────────────────────────┤
+│                                 │
+│  📊  Central Dashboard          │
+│      Metrics · Status counts    │
+│                                 │
+│  📬  Assigned Complaint Feed    │
+│      Live · Never refresh       │
+│                                 │
+│  🔄  Status Control             │
+│      Pending → In Progress      │
+│      In Progress → Resolved     │
+│                                 │
+│  📋  Full Complaint Context     │
+│      Image · Location · Time    │
+│                                 │
+│  🗒️  Resolution Docs            │
+│      Timestamped audit trail    │
+│                                 │
+└─────────────────────────────────┘
+```
+
+</td>
+</tr>
+</table>
+
+---
+
+<br/>
+
+## 🔄 Complaint Lifecycle
+
+<div align="center">
+
+![lifecycle](https://img.shields.io/badge/%F0%9F%9F%A1%20PENDING-complaint%20submitted-f59e0b?style=for-the-badge)
+&nbsp;**`──────►`**&nbsp;
+![inprogress](https://img.shields.io/badge/%F0%9F%94%B5%20IN%20PROGRESS-admin%20active-3b82f6?style=for-the-badge)
+&nbsp;**`──────►`**&nbsp;
+![resolved](https://img.shields.io/badge/%F0%9F%9F%A2%20RESOLVED-closed%20%2B%20notes-22c55e?style=for-the-badge)
+
+<br/>
+
+| Stage | Who Acts | What Happens |
+|:---:|:---:|---|
+| 🟡 **Pending** | User submits | Complaint created, admin notified, status visible |
+| 🔵 **In Progress** | Admin picks up | Status updated live, user sees change instantly |
+| 🟢 **Resolved** | Admin closes | Resolution note saved, timestamped, audit trail locked |
 
 </div>
 
@@ -35,129 +112,42 @@
 
 <br/>
 
-## 🌊 What is FixFlow?
-
-**FixFlow** is a modern, real-time complaint management platform that eliminates the frustration of manual, opaque complaint handling. Built with Flutter and Firebase, it connects complainants and administrators in a single, transparent digital system — where every issue is tracked, every update is instant, and no complaint ever falls through the cracks.
-
-> *Submit a complaint in under 2 minutes. Watch it resolve in real time.*
-
-🔗 **Try it live:** [https://fixflow-dc246.web.app/](https://fixflow-dc246.web.app/)
-
-<br/>
-
----
-
-## ✨ Why FixFlow Stands Out
-
-<br/>
-
-### 🔴 The Problem It Solves
-Manual complaint handling is slow, error-prone, and invisible. Complainants submit issues and hear nothing for days. Administrators drown in emails and spreadsheets. Nothing is tracked. Nothing is transparent.
-
-### 🟢 The FixFlow Difference
-
-| Old Way | FixFlow Way |
-|---|---|
-| Email chains, paper forms | One clean digital submission form |
-| "We'll get back to you" | Live status updates the moment anything changes |
-| No idea who's handling it | Direct admin assignment with contact info |
-| Lost in the inbox | Centralized dashboard, nothing missed |
-| No proof of resolution | Timestamped resolution notes, full audit trail |
-
-<br/>
-
----
-
-## 🚀 Core Features
-
-<br/>
-
-### 👤 For Users — Complete Visibility
-
-- **One-tap Google Sign-In** — secure SSO via Firebase Auth, no passwords to remember
-- **Smart Complaint Form** — title, description, category, location, image attachment, and direct admin assignment in a single guided flow
-- **Image Attachments** — upload photo evidence directly from your device, hosted securely on Cloudinary CDN
-- **Real-time Status Tracking** — watch your complaint move from Pending to In Progress to Resolved as it happens, powered by Firestore live streams
-- **Resolution Notes** — see exactly what action was taken and when, with full admin commentary
-- **Complaint History** — every complaint you've ever submitted, in one place, with full timeline
-
-<br/>
-
-### 🛡️ For Admins — Total Control
-
-- **Centralized Dashboard** — instant overview of all assigned complaints broken down by Pending, In Progress, and Resolved
-- **Live Complaint Feed** — real-time stream of assigned complaints, nothing needs refreshing
-- **One-click Status Updates** — move complaints through the resolution pipeline with a single tap
-- **Resolution Documentation** — add detailed notes at any stage, visible immediately to the complainant
-- **Full Complaint Context** — access every detail the user submitted — description, category, location, image, timestamp, and contact info — all in one screen
-- **Audit Trail** — every status change and note is timestamped, creating a permanent record of accountability
-
-<br/>
-
----
-
-## 🔄 The Complaint Lifecycle
-
-```
-╔══════════════╗       ╔═══════════════╗       ╔══════════════╗
-║              ║       ║               ║       ║              ║
-║   🟡 PENDING  ║──────►║ 🔵 IN PROGRESS ║──────►║  🟢 RESOLVED  ║
-║              ║       ║               ║       ║              ║
-║  Submitted   ║       ║ Admin working ║       ║ Closed +     ║
-║  by user     ║       ║ on the issue  ║       ║ notes added  ║
-╚══════════════╝       ╚═══════════════╝       ╚══════════════╝
-       │                       │                      │
-  Visible to              Visible to             Visible to
-    user                    user                   user
-```
-
-Every transition is **instant** and **visible to both sides** the moment it happens.
-
-<br/>
-
----
-
 ## 🛠️ Tech Stack
-
-FixFlow is built on a modern, production-grade stack designed for performance, reliability, and real-time responsiveness.
-
-```
-┌────────────────────────────────────────────────────┐
-│                 Flutter (Dart)                     │
-│        Cross-platform · iOS · Android · Web        │
-├──────────────────┬─────────────────────────────────┤
-│  Firebase Auth   │       Cloud Firestore           │
-│  Google Sign-In  │   Real-time NoSQL database      │
-│  Session mgmt    │   Live streams · Offline sync   │
-├──────────────────┴─────────────────────────────────┤
-│               Cloudinary CDN                       │
-│       Image upload · Optimisation · Hosting        │
-├────────────────────────────────────────────────────┤
-│    Provider  ·  go_router  ·  flutter_animate      │
-│     State        Routing        Animations         │
-└────────────────────────────────────────────────────┘
-```
-
-<br/>
-
----
-
-## 🎯 Design Principles
-
-- **Speed** — complaint submission in under 2 minutes, app load under 3 seconds
-- **Transparency** — every status change is immediately visible to the user, no black boxes
-- **Simplicity** — intuitive flows designed for users with basic smartphone literacy
-- **Reliability** — Firebase infrastructure, Cloudinary CDN, crash rate target under 0.1%
-- **Real-time** — Firestore live streams mean zero manual refreshing, ever
-
-<br/>
-
-
 
 <div align="center">
 
-**Built with 💙 Flutter · Firebase · Cloudinary**
+| Layer | Technology | Purpose |
+|:---:|:---:|---|
+| 📱 **Frontend** | Flutter 3.x · Dart | Cross-platform UI — iOS, Android, Web |
+| 🔐 **Auth** | Firebase Auth · Google Sign-In | Secure SSO, session management |
+| 🗄️ **Database** | Cloud Firestore | Realtime NoSQL, live streams |
+| 🖼️ **Storage** | Cloudinary CDN | Image upload, optimisation, delivery |
+| ⚙️ **State** | Provider | AuthProvider, ComplaintProvider |
+| 🧭 **Routing** | go_router | Role-based navigation guards |
+| ✨ **Animation** | flutter_animate | Smooth transitions, micro-interactions |
 
-*If FixFlow impressed you, drop a ⭐ — it genuinely means a lot.*
+</div>
+
+---
+
+<br/>
+
+## 📊 Performance Targets
+
+<div align="center">
+
+![submit](https://img.shields.io/badge/Submission-%3C%202%20minutes-6c47ff?style=flat-square&logo=checkmarx&logoColor=white)
+![load](https://img.shields.io/badge/App%20Load-%3C%203%20seconds-0ea5e9?style=flat-square&logo=speedtest&logoColor=white)
+![stream](https://img.shields.io/badge/Live%20Update-%3C%201%20second-22c55e?style=flat-square&logo=firebase&logoColor=white)
+![image](https://img.shields.io/badge/Image%20Upload-%3C%205%20seconds-f59e0b?style=flat-square&logo=cloudinary&logoColor=white)
+![crash](https://img.shields.io/badge/Crash%20Rate-%3C%200.1%25-ef4444?style=flat-square&logo=flutter&logoColor=white)
+
+</div>
+
+---
+
+<div align="center">
+
+<img src="https://capsule-render.vercel.app/api?type=waving&color=0:0d0d1a,50:1a0533,100:0d0d1a&height=120&section=footer&text=Try%20FixFlow%20Live&fontSize=24&fontColor=ffffff&fontAlignY=65&animation=fadeIn&desc=fixflow-dc246.web.app&descSize=14&descAlignY=85&descAlign=50" width="100%"/>
 
 </div>
