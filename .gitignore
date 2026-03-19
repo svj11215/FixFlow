@@ -43,3 +43,17 @@ app.*.map.json
 /android/app/debug
 /android/app/profile
 /android/app/release
+# Production/Signing related (SENSITIVE - Never commit)
+*.jks
+*.keystore
+.env.production
+.env.local
+google-services.json
+GoogleService-Info.plist
+app.jks
+
+# Firebase credentials
+firebase_options.dart.bak
+
+# IDE
+.vscode/launch.json

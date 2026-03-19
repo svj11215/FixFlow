@@ -2,7 +2,7 @@ name: fixflow
 description: "FixFlow - Complaint Management System"
 publish_to: 'none'
 
-version: 1.0.0+1
+version: 1.0.0+100
 
 environment:
   sdk: ^3.10.4
