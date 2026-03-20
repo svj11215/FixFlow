@@ -62,7 +62,7 @@ class _SplashScreenState extends State<SplashScreen>
       setState(() => _isFadingOut = true);
       await Future.delayed(const Duration(milliseconds: 400));
       if (mounted) {
-        final auth = context.read<AuthProvider>();
+        final auth = context.read<AppAuthProvider>();
         // Wait for auth to finish loading if it hasn't
         while (auth.isLoading) {
           await Future.delayed(const Duration(milliseconds: 100));

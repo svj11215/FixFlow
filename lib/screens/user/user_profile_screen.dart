@@ -1,7 +1,10 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:go_router/go_router.dart';
 import 'package:flutter_animate/flutter_animate.dart';
+import 'package:google_fonts/google_fonts.dart';
+import '../../main.dart';
 import '../../models/complaint_model.dart';
 import '../../providers/auth_provider.dart';
 import '../../providers/complaint_provider.dart';
@@ -24,7 +27,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
     super.initState();
     // Pre-fill name
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      final authProvider = context.read<AuthProvider>();
+      final authProvider = context.read<AppAuthProvider>();
       if (authProvider.userModel != null) {
         _nameController.text = authProvider.userModel!.name;
       } else if (authProvider.currentUser != null) {
@@ -39,7 +42,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
     super.dispose();
   }
 
-  Future<void> _saveChanges(AuthProvider authProvider) async {
+  Future<void> _saveChanges(AppAuthProvider authProvider) async {
     final newName = _nameController.text.trim();
     if (newName.isEmpty || newName == authProvider.userModel?.name) {
       setState(() => _isEditingName = false);
@@ -77,7 +80,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
     }
   }
 
-  Future<void> _confirmSignOut(AuthProvider authProvider) async {
+  Future<void> _confirmSignOut(AppAuthProvider authProvider) async {
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
@@ -153,7 +156,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.background,
-      body: Consumer<AuthProvider>(
+      body: Consumer<AppAuthProvider>(
         builder: (context, authProvider, _) {
           final userModel = authProvider.userModel;
           final firebaseUser = authProvider.currentUser;
@@ -164,7 +167,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
 
           final displayName = userModel?.name ?? firebaseUser?.displayName ?? 'User';
           final email = userModel?.email ?? firebaseUser?.email ?? 'No email';
-          final photoUrl = firebaseUser?.photoURL;
+          final photoUrl = safePhotoUrl(firebaseUser);
 
           return CustomScrollView(
             slivers: [
@@ -202,14 +205,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                                 ),
                               ],
                             ),
-                            child: CircleAvatar(
-                              radius: 50,
-                              backgroundColor: Colors.white,
-                              backgroundImage: photoUrl != null ? NetworkImage(photoUrl) : null,
-                              child: photoUrl == null
-                                  ? const Icon(Icons.person, size: 50, color: AppColors.primary)
-                                  : null,
-                            ),
+                            child: _buildProfileAvatar(photoUrl, displayName, 50),
                           ).animate(onPlay: (controller) => controller.repeat(reverse: true))
                            .scale(begin: const Offset(1.0, 1.0), end: const Offset(1.03, 1.03), duration: 2.seconds, curve: Curves.easeInOut),
                           
@@ -479,10 +475,24 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                           const SizedBox(height: 32),
                           
                           // Version Note
-                          const Center(
-                            child: Text(
-                              'FixFlow Version 1.0.0',
-                              style: TextStyle(color: AppColors.textMuted, fontSize: 13),
+                          Center(
+                            child: Column(
+                              children: [
+                                Text(
+                                  'FixFlow Version 1.0.0',
+                                  style: TextStyle(color: Colors.grey.shade400, fontSize: 12),
+                                ),
+                                const SizedBox(height: 4),
+                                Text(
+                                  'Made by SJ',
+                                  style: TextStyle(
+                                    color: Colors.grey.shade400,
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.w600,
+                                    letterSpacing: 1.2,
+                                  ),
+                                ),
+                              ],
                             ),
                           ).animate().fadeIn(duration: 400.ms, delay: 500.ms),
                           
@@ -528,6 +538,43 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
           ),
         ),
       ],
+    );
+  }
+
+  /// Builds a safe profile avatar with fallback to initials
+  Widget _buildProfileAvatar(String? photoUrl, String displayName, double radius) {
+    final initials = displayName.isNotEmpty
+        ? displayName.trim().split(' ').map((e) => e.isNotEmpty ? e[0] : '').take(2).join().toUpperCase()
+        : '?';
+
+    if (photoUrl != null && photoUrl.isNotEmpty) {
+      return CircleAvatar(
+        radius: radius,
+        backgroundColor: Colors.white,
+        child: ClipOval(
+          child: CachedNetworkImage(
+            imageUrl: photoUrl,
+            width: radius * 2,
+            height: radius * 2,
+            fit: BoxFit.cover,
+            errorWidget: (context, url, error) => _buildInitialsAvatar(initials, radius),
+            placeholder: (context, url) => _buildInitialsAvatar(initials, radius),
+          ),
+        ),
+      );
+    }
+    return CircleAvatar(
+      radius: radius,
+      backgroundColor: Colors.white,
+      child: _buildInitialsAvatar(initials, radius),
+    );
+  }
+
+  Widget _buildInitialsAvatar(String initials, double radius) {
+    return Icon(
+      Icons.person,
+      size: radius,
+      color: AppColors.primary,
     );
   }
 }

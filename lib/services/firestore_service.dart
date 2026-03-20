@@ -81,6 +81,7 @@ class FirestoreService {
         .collection('complaints')
         .where('userId', isEqualTo: userId)
         .orderBy('createdAt', descending: true)
+        .limit(50)
         .snapshots()
         .map((snapshot) => snapshot.docs
             .map((doc) => ComplaintModel.fromFirestore(doc))
@@ -92,6 +93,7 @@ class FirestoreService {
         .collection('complaints')
         .where('adminId', isEqualTo: adminId)
         .orderBy('createdAt', descending: false)
+        .limit(50)
         .snapshots()
         .map((snapshot) => snapshot.docs
             .map((doc) => ComplaintModel.fromFirestore(doc))

@@ -1,9 +1,12 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:go_router/go_router.dart';
 import 'package:flutter_animate/flutter_animate.dart';
+import 'package:google_fonts/google_fonts.dart';
+import '../../main.dart';
 import '../../models/complaint_model.dart';
 import '../../providers/auth_provider.dart';
 import '../../services/firestore_service.dart';
@@ -50,7 +53,7 @@ class _AdminProfileScreenState extends State<AdminProfileScreen> {
   }
 
   Future<void> _loadAdminData() async {
-    final authProvider = context.read<AuthProvider>();
+    final authProvider = context.read<AppAuthProvider>();
     final email = authProvider.currentUser?.email;
     if (email == null) return;
 
@@ -70,7 +73,7 @@ class _AdminProfileScreenState extends State<AdminProfileScreen> {
 
   Future<void> _saveChanges() async {
     setState(() => _isSaving = true);
-    final authProvider = context.read<AuthProvider>();
+    final authProvider = context.read<AppAuthProvider>();
     final email = authProvider.currentUser?.email;
 
     final query = await FirebaseFirestore.instance
@@ -198,7 +201,7 @@ class _AdminProfileScreenState extends State<AdminProfileScreen> {
 
     if (confirmed == true) {
       if (!mounted) return;
-      final authProvider = context.read<AuthProvider>();
+      final authProvider = context.read<AppAuthProvider>();
       await authProvider.signOut();
       if (mounted) context.go('/login');
     }
@@ -206,9 +209,9 @@ class _AdminProfileScreenState extends State<AdminProfileScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final authProvider = context.watch<AuthProvider>();
+    final authProvider = context.watch<AppAuthProvider>();
     final user = authProvider.currentUser;
-    final photoUrl = user?.photoURL;
+    final photoUrl = safePhotoUrl(user);
     final adminName = _adminData?['name'] ?? user?.displayName ?? 'Admin';
     final email = _adminData?['email'] ?? user?.email ?? '';
     final department = _adminData?['department'] ?? '';
@@ -252,14 +255,7 @@ class _AdminProfileScreenState extends State<AdminProfileScreen> {
                                       shape: BoxShape.circle,
                                       border: Border.all(color: Colors.white, width: 3),
                                     ),
-                                    child: CircleAvatar(
-                                      radius: 40,
-                                      backgroundColor: Colors.white24,
-                                      backgroundImage: photoUrl != null ? NetworkImage(photoUrl) : null,
-                                      child: photoUrl == null
-                                          ? const Icon(Icons.admin_panel_settings, size: 40, color: Colors.white)
-                                          : null,
-                                    ),
+                                    child: _buildProfileAvatar(photoUrl, adminName, 40),
                                   ).animate().scale(begin: const Offset(0.9, 0.9), duration: 400.ms, curve: Curves.easeOutBack),
                                   
                                   const SizedBox(height: 12),
@@ -679,11 +675,23 @@ class _AdminProfileScreenState extends State<AdminProfileScreen> {
                     SliverToBoxAdapter(
                       child: Padding(
                         padding: const EdgeInsets.symmetric(vertical: 32),
-                        child: const Center(
-                          child: Text(
-                            'FixFlow Admin v1.0.0',
-                            style: TextStyle(color: AppColors.textMuted, fontSize: 11),
-                          ),
+                        child: Column(
+                          children: [
+                            Text(
+                              'FixFlow Admin v1.0.0',
+                              style: TextStyle(color: Colors.grey.shade400, fontSize: 12),
+                            ),
+                            const SizedBox(height: 4),
+                            Text(
+                              'Made by SJ',
+                              style: TextStyle(
+                                color: Colors.grey.shade400,
+                                fontSize: 12,
+                                fontWeight: FontWeight.w600,
+                                letterSpacing: 1.2,
+                              ),
+                            ),
+                          ],
                         ).animate().fadeIn(duration: 400.ms, delay: 800.ms),
                       ),
                     ),
@@ -754,5 +762,42 @@ class _AdminProfileScreenState extends State<AdminProfileScreen> {
   void dispose() {
     _nameController.dispose();
     super.dispose();
+  }
+
+  /// Builds a safe profile avatar with fallback to initials
+  Widget _buildProfileAvatar(String? photoUrl, String displayName, double radius) {
+    final initials = displayName.isNotEmpty
+        ? displayName.trim().split(' ').map((e) => e.isNotEmpty ? e[0] : '').take(2).join().toUpperCase()
+        : 'A';
+
+    if (photoUrl != null && photoUrl.isNotEmpty) {
+      return CircleAvatar(
+        radius: radius,
+        backgroundColor: Colors.white24,
+        child: ClipOval(
+          child: CachedNetworkImage(
+            imageUrl: photoUrl,
+            width: radius * 2,
+            height: radius * 2,
+            fit: BoxFit.cover,
+            errorWidget: (context, url, error) => _buildInitialsAvatar(initials, radius),
+            placeholder: (context, url) => _buildInitialsAvatar(initials, radius),
+          ),
+        ),
+      );
+    }
+    return CircleAvatar(
+      radius: radius,
+      backgroundColor: Colors.white24,
+      child: _buildInitialsAvatar(initials, radius),
+    );
+  }
+
+  Widget _buildInitialsAvatar(String initials, double radius) {
+    return Icon(
+      Icons.admin_panel_settings,
+      size: radius,
+      color: Colors.white,
+    );
   }
 }

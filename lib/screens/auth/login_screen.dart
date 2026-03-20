@@ -61,7 +61,7 @@ class _LoginScreenState extends State<LoginScreen> {
           
           // Content
           SafeArea(
-            child: Consumer<AuthProvider>(
+            child: Consumer<AppAuthProvider>(
               builder: (context, authProvider, _) {
                 return CustomScrollView(
                   slivers: [
@@ -392,12 +392,12 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 
   Future<void> _signInAsUser(
-      BuildContext context, AuthProvider authProvider) async {
+      BuildContext context, AppAuthProvider authProvider) async {
     await authProvider.signInAsUser();
   }
 
   Future<void> _signInAsAdmin(
-      BuildContext context, AuthProvider authProvider) async {
+      BuildContext context, AppAuthProvider authProvider) async {
     await authProvider.signInAsAdmin();
   }
 }

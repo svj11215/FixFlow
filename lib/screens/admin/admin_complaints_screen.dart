@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_animate/flutter_animate.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:shimmer/shimmer.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import '../../models/complaint_model.dart';
@@ -79,7 +80,7 @@ class _AdminComplaintsScreenState extends State<AdminComplaintsScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final authProvider = context.read<AuthProvider>();
+    final authProvider = context.read<AppAuthProvider>();
     final adminId = authProvider.adminModel?.adminIdString ?? '';
 
     return Scaffold(
@@ -206,46 +207,39 @@ class _AdminComplaintsScreenState extends State<AdminComplaintsScreen> {
                     // Filter Chips Row
                     SliverToBoxAdapter(
                       child: Padding(
-                        padding: const EdgeInsets.only(left: 24, top: 16, bottom: 12),
-                        child: SingleChildScrollView(
-                          scrollDirection: Axis.horizontal,
-                          physics: const BouncingScrollPhysics(),
-                          child: Row(
-                            children: AppStatuses.filterStatuses.map((filter) {
-                              final isSelected = _statusFilter == filter;
-                              final count = statusCounts[filter] ?? 0;
-                              return Padding(
-                                padding: const EdgeInsets.only(right: 8),
-                                child: FilterChip(
-                                  label: AnimatedDefaultTextStyle(
-                                    duration: const Duration(milliseconds: 200),
-                                    style: TextStyle(
-                                      color: isSelected ? Colors.white : AppColors.textSecondary,
-                                      fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
-                                      fontSize: 13,
-                                    ),
-                                    child: Text('$filter ($count)'),
-                                  ),
-                                  selected: isSelected,
-                                  onSelected: (selected) {
-                                    if (selected) setState(() => _statusFilter = filter);
-                                  },
-                                  backgroundColor: Colors.white,
-                                  selectedColor: AppColors.primary,
-                                  showCheckmark: false,
-                                  elevation: isSelected ? 4 : 0,
-                                  pressElevation: 0,
-                                  shadowColor: AppColors.primary.withValues(alpha: 0.3),
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(20),
-                                    side: BorderSide(
-                                      color: isSelected ? AppColors.primary : AppColors.borderLight,
-                                    ),
-                                  ),
+                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                        child: Wrap(
+                          spacing: 8,
+                          runSpacing: 8,
+                          alignment: WrapAlignment.center,
+                          children: AppStatuses.filterStatuses.map((filter) {
+                            final isSelected = _statusFilter == filter;
+                            final count = statusCounts[filter] ?? 0;
+                            return FilterChip(
+                              label: Text('$filter ($count)'),
+                              labelStyle: GoogleFonts.poppins(
+                                fontSize: 13,
+                                color: isSelected ? Colors.white : AppColors.textSecondary,
+                                fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
+                              ),
+                              selected: isSelected,
+                              onSelected: (selected) {
+                                if (selected) setState(() => _statusFilter = filter);
+                              },
+                              backgroundColor: Colors.white,
+                              selectedColor: const Color(0xFF1565C0),
+                              selectedShadowColor: const Color(0xFF1565C0).withValues(alpha: 0.3),
+                              showCheckmark: false,
+                              elevation: isSelected ? 2 : 0,
+                              pressElevation: 0,
+                              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                              shape: StadiumBorder(
+                                side: BorderSide(
+                                  color: isSelected ? const Color(0xFF1565C0) : const Color(0xFFDDDDDD),
                                 ),
-                              );
-                            }).toList(),
-                          ),
+                              ),
+                            );
+                          }).toList(),
                         ).animate().fadeIn(delay: 200.ms).slideX(begin: 0.1),
                       ),
                     ),

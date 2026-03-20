@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 
 class AppColors {
-  static const Color primary = Color(0xFF2563EB);
-  static const Color primaryDark = Color(0xFF1D4ED8);
+  static const Color primary = Color(0xFF1565C0);
+  static const Color primaryDark = Color(0xFF0D47A1);
   static const Color primaryLight = Color(0xFFEFF6FF);
-  static const Color accentTeal = Color(0xFF0EA5E9);
+  static const Color accentTeal = Color(0xFF42A5F5);
   static const Color secondary = Color(0xFF10B981);
   static const Color warning = Color(0xFFF59E0B);
   static const Color error = Color(0xFFEF4444);
@@ -15,8 +15,8 @@ class AppColors {
   static const Color textPrimary = Color(0xFF0F172A);
   static const Color textSecondary = Color(0xFF64748B);
   static const Color textMuted = Color(0xFF94A3B8);
-  static const Color gradientStart = Color(0xFF2563EB);
-  static const Color gradientEnd = Color(0xFF0EA5E9);
+  static const Color gradientStart = Color(0xFF1565C0);
+  static const Color gradientEnd = Color(0xFF42A5F5);
 
   static Color statusColor(String status) {
     switch (status) {

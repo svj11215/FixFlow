@@ -1,8 +1,12 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 
 import 'package:provider/provider.dart';
 import 'package:flutter_animate/flutter_animate.dart';
+import 'package:flutter/services.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import '../../main.dart';
 import '../../providers/auth_provider.dart';
 import '../../utils/constants.dart';
 import 'admin_dashboard_screen.dart';
@@ -54,25 +58,15 @@ class _AdminHomeScreenState extends State<AdminHomeScreen> {
     });
   }
 
-  String _getAppBarTitle() {
-    switch (_currentIndex) {
-      case 0:
-        return 'Dashboard';
-      case 1:
-        return 'Complaints';
-      case 2:
-        return 'My Profile';
-      default:
-        return 'FixFlow Admin';
-    }
-  }
 
   @override
   Widget build(BuildContext context) {
-    final authProvider = context.watch<AuthProvider>();
+    final authProvider = context.watch<AppAuthProvider>();
     final adminModel = authProvider.adminModel;
     final adminId = adminModel?.adminIdString ?? '';
-    final photoUrl = authProvider.currentUser?.photoURL;
+    final photoUrl = safePhotoUrl(authProvider.currentUser);
+    final adminName = adminModel?.name ?? authProvider.currentUser?.displayName ?? 'Admin';
+    final firstName = adminName.trim().isNotEmpty ? adminName.trim().split(' ')[0] : 'Admin';
 
     final String? filterToPass = _pendingFilter;
     if (_pendingFilter != null && _currentIndex == 1) {
@@ -89,142 +83,78 @@ class _AdminHomeScreenState extends State<AdminHomeScreen> {
     ];
 
     final isMobile = MediaQuery.sizeOf(context).width < 600;
-    final appBarHeight = isMobile ? 56.0 : 60.0;
 
     return Scaffold(
       backgroundColor: AppColors.background,
-      appBar: PreferredSize(
-        preferredSize: Size.fromHeight(appBarHeight),
-        child: Container(
-          decoration: BoxDecoration(
-            gradient: const LinearGradient(
-              colors: [Color(0xFF1E3A5F), AppColors.primary],
-            ),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withValues(alpha: 0.15),
-                blurRadius: 6,
-                offset: const Offset(0, 2),
-              ),
-            ],
-          ),
-          child: SafeArea(
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-              child: Stack(
-                alignment: Alignment.center,
-                children: [
-                  // CENTER CONTENT
-                  if (isMobile)
-                    AnimatedSwitcher(
-                      duration: const Duration(milliseconds: 200),
-                      child: Text(
-                        _getAppBarTitle(),
-                        key: ValueKey<String>(_getAppBarTitle()),
-                        style: const TextStyle(color: Colors.white, fontSize: 17, fontWeight: FontWeight.w600),
-                      ),
-                    ),
-
-                  // LEFT CONTENT
-                  Align(
-                    alignment: Alignment.centerLeft,
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        // Logo
-                        Container(
-                          width: isMobile ? 28 : 30,
-                          height: isMobile ? 28 : 30,
-                          decoration: BoxDecoration(
-                            color: Colors.white,
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                          child: Icon(Icons.build_rounded, color: AppColors.primary, size: isMobile ? 16 : 18),
-                        ),
-                        if (!isMobile) ...[
-                          const SizedBox(width: 8),
-                          const Text(
-                            'FixFlow',
-                            style: TextStyle(color: Colors.white, fontWeight: FontWeight.w700, fontSize: 17),
-                          ),
-                          const SizedBox(width: 6),
-                          Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 2),
-                            decoration: BoxDecoration(
-                              color: Colors.white.withValues(alpha: 0.2),
-                              borderRadius: BorderRadius.circular(6),
-                            ),
-                            child: const Text(
-                              'Admin',
-                              style: TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.w600),
-                            ),
-                          ),
-                        ],
-                      ],
-                    ),
-                  ),
-
-                  // RIGHT CONTENT
-                  Align(
-                    alignment: Alignment.centerRight,
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        if (!isMobile) ...[
-                          Tooltip(
-                            message: 'Notifications',
-                            child: Stack(
-                              children: [
-                                IconButton(
-                                  icon: const Icon(Icons.notifications_outlined, color: Colors.white, size: 20),
-                                  onPressed: () {},
-                                ),
-                                Positioned(
-                                  right: 10,
-                                  top: 10,
-                                  child: Container(
-                                    width: 8,
-                                    height: 8,
-                                    decoration: const BoxDecoration(
-                                      color: AppColors.error,
-                                      shape: BoxShape.circle,
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                          const SizedBox(width: 10),
-                        ],
-                        Tooltip(
-                          message: 'View Profile',
-                          child: GestureDetector(
-                            onTap: () => _switchToTab(2),
-                            child: Container(
-                              padding: const EdgeInsets.all(2),
-                              decoration: BoxDecoration(
-                                shape: BoxShape.circle,
-                                border: Border.all(color: Colors.white, width: isMobile ? 1.5 : 2),
-                              ),
-                              child: CircleAvatar(
-                                radius: isMobile ? 16 : 17,
-                                backgroundColor: Colors.white24,
-                                backgroundImage: photoUrl != null ? NetworkImage(photoUrl) : null,
-                                child: photoUrl == null
-                                    ? Icon(Icons.person, color: Colors.white, size: isMobile ? 16 : 18)
-                                    : null,
-                              ),
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
+      appBar: AppBar(
+        elevation: 0,
+        toolbarHeight: 60,
+        titleSpacing: 12,
+        systemOverlayStyle: SystemUiOverlayStyle.light,
+        flexibleSpace: Container(
+          decoration: const BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.centerLeft,
+              end: Alignment.centerRight,
+              colors: [Color(0xFF1565C0), Color(0xFF42A5F5)],
             ),
           ),
         ),
+        backgroundColor: Colors.transparent,
+        title: Row(
+          children: [
+            Container(
+              width: 32,
+              height: 32,
+              decoration: BoxDecoration(
+                border: Border.all(color: Colors.white, width: 1.5),
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: const Icon(Icons.build_rounded, color: Colors.white, size: 16),
+            ),
+            const SizedBox(width: 10),
+            Text(
+              'FixFlow',
+              style: GoogleFonts.poppins(
+                fontWeight: FontWeight.w700,
+                fontSize: 20,
+                color: Colors.white,
+              ),
+            ),
+            if (!isMobile) ...[
+              const SizedBox(width: 8),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 2),
+                decoration: BoxDecoration(
+                  color: Colors.white.withValues(alpha: 0.2),
+                  borderRadius: BorderRadius.circular(6),
+                ),
+                child: Text(
+                  'Admin',
+                  style: GoogleFonts.poppins(color: Colors.white, fontSize: 10, fontWeight: FontWeight.w600),
+                ),
+              ),
+            ],
+          ],
+        ),
+        actions: [
+          Padding(
+            padding: const EdgeInsets.only(right: 12),
+            child: GestureDetector(
+              onTap: () => _switchToTab(2),
+              child: Container(
+                width: 36,
+                height: 36,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  border: Border.all(color: Colors.white, width: 2),
+                  color: Colors.white24,
+                ),
+                child: _buildProfileAvatar(photoUrl, firstName, 16),
+              ),
+            ),
+          ),
+        ],
       ),
       body: LayoutBuilder(
         builder: (context, constraints) {
@@ -444,6 +374,58 @@ class _AdminHomeScreenState extends State<AdminHomeScreen> {
           ).animate().scale(begin: const Offset(1.3, 1.3), end: const Offset(1.0, 1.0), duration: 200.ms),
         );
       },
+    );
+  }
+
+  /// Builds a safe profile avatar with fallback to initials
+  Widget _buildProfileAvatar(String? photoUrl, String displayName, double radius) {
+    final initials = displayName.isNotEmpty
+        ? displayName.trim().split(' ').map((e) => e.isNotEmpty ? e[0] : '').take(2).join().toUpperCase()
+        : 'A';
+
+    if (photoUrl != null && photoUrl.isNotEmpty) {
+      return Container(
+        width: radius * 2,
+        height: radius * 2,
+        decoration: BoxDecoration(
+          shape: BoxShape.circle,
+          border: Border.all(color: Colors.white, width: 2),
+          color: Colors.white24,
+        ),
+        child: ClipOval(
+          child: CachedNetworkImage(
+            imageUrl: photoUrl,
+            width: radius * 2,
+            height: radius * 2,
+            fit: BoxFit.cover,
+            errorWidget: (context, url, error) => _buildInitialsAvatar(initials, radius),
+            placeholder: (context, url) => _buildInitialsAvatar(initials, radius),
+          ),
+        ),
+      );
+    }
+    return Container(
+      width: radius * 2,
+      height: radius * 2,
+      decoration: BoxDecoration(
+        shape: BoxShape.circle,
+        border: Border.all(color: Colors.white, width: 2),
+        color: Colors.white24,
+      ),
+      child: _buildInitialsAvatar(initials, radius),
+    );
+  }
+
+  Widget _buildInitialsAvatar(String initials, double radius) {
+    return Center(
+      child: Text(
+        initials,
+        style: GoogleFonts.poppins(
+          fontSize: radius * 0.6,
+          fontWeight: FontWeight.w600,
+          color: Colors.white,
+        ),
+      ),
     );
   }
 }

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:shimmer/shimmer.dart';
 import 'package:flutter_animate/flutter_animate.dart';
+import 'package:google_fonts/google_fonts.dart';
 import '../../models/complaint_model.dart';
 import '../../providers/auth_provider.dart';
 import '../../providers/complaint_provider.dart';
@@ -15,12 +16,17 @@ class MyComplaintsScreen extends StatefulWidget {
   State<MyComplaintsScreen> createState() => _MyComplaintsScreenState();
 }
 
-class _MyComplaintsScreenState extends State<MyComplaintsScreen> {
+class _MyComplaintsScreenState extends State<MyComplaintsScreen>
+    with AutomaticKeepAliveClientMixin {
   String _selectedFilter = 'All';
 
   @override
+  bool get wantKeepAlive => true;
+
+  @override
   Widget build(BuildContext context) {
-    final authProvider = context.read<AuthProvider>();
+    super.build(context);
+    final authProvider = context.read<AppAuthProvider>();
     final userId = authProvider.currentUser?.uid ?? '';
 
     return Scaffold(
@@ -47,6 +53,7 @@ class _MyComplaintsScreenState extends State<MyComplaintsScreen> {
             child: ConstrainedBox(
               constraints: const BoxConstraints(maxWidth: 600),
               child: CustomScrollView(
+                physics: const BouncingScrollPhysics(),
                 slivers: [
                   SliverPadding(
                     padding: const EdgeInsets.only(top: 24, left: 20, right: 20, bottom: 16),
@@ -54,9 +61,9 @@ class _MyComplaintsScreenState extends State<MyComplaintsScreen> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          const Text(
+                          Text(
                             'My Complaints',
-                            style: TextStyle(
+                            style: GoogleFonts.poppins(
                               fontSize: 24,
                               fontWeight: FontWeight.w800,
                               color: AppColors.textPrimary,
@@ -64,9 +71,9 @@ class _MyComplaintsScreenState extends State<MyComplaintsScreen> {
                             ),
                           ),
                           const SizedBox(height: 4),
-                          const Text(
+                          Text(
                             'Track the status of your reported issues.',
-                            style: TextStyle(
+                            style: GoogleFonts.poppins(
                               fontSize: 14,
                               color: AppColors.textSecondary,
                             ),
@@ -74,90 +81,74 @@ class _MyComplaintsScreenState extends State<MyComplaintsScreen> {
                           const SizedBox(height: 24),
                           
                           // Stats Grid
-                          Column(
-                            children: [
-                              Row(
-                                children: [
-                                  Expanded(child: _buildStatCard(context, 'Total', total, Icons.analytics_outlined, AppColors.primary)),
-                                  const SizedBox(width: 8),
-                                  Expanded(child: _buildStatCard(context, 'Pending', pending, Icons.schedule, AppColors.warning)),
-                                  const SizedBox(width: 8),
-                                  Expanded(child: _buildStatCard(context, 'Resolved', resolved, Icons.check_circle_outline, AppColors.secondary)),
-                                ],
-                              ),
-                              const SizedBox(height: 8),
-                              LayoutBuilder(
-                                builder: (context, constraints) {
-                                  final cardWidth = constraints.maxWidth * 0.45;
-                                  return Row(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: [
-                                      SizedBox(width: cardWidth, child: _buildStatCard(context, 'In Progress', inProgress, Icons.sync, AppColors.accentTeal)),
-                                      SizedBox(width: constraints.maxWidth * 0.10 - 1), // gap
-                                      SizedBox(width: cardWidth, child: _buildStatCard(context, 'Rejected', rejected, Icons.cancel_outlined, AppColors.error)),
-                                    ],
-                                  );
-                                },
-                              ),
-                            ],
-                          ).animate().fadeIn(duration: 400.ms).slideY(begin: 0.1),
+                          RepaintBoundary(
+                            child: Column(
+                              children: [
+                                Row(
+                                  children: [
+                                    Expanded(child: _buildStatCard(context, 'Total', total, Icons.analytics_outlined, AppColors.primary)),
+                                    const SizedBox(width: 8),
+                                    Expanded(child: _buildStatCard(context, 'Pending', pending, Icons.schedule, AppColors.warning)),
+                                    const SizedBox(width: 8),
+                                    Expanded(child: _buildStatCard(context, 'Resolved', resolved, Icons.check_circle_outline, AppColors.secondary)),
+                                  ],
+                                ),
+                                const SizedBox(height: 8),
+                                LayoutBuilder(
+                                  builder: (context, constraints) {
+                                    final cardWidth = constraints.maxWidth * 0.45;
+                                    return Row(
+                                      mainAxisAlignment: MainAxisAlignment.center,
+                                      children: [
+                                        SizedBox(width: cardWidth, child: _buildStatCard(context, 'In Progress', inProgress, Icons.sync, AppColors.accentTeal)),
+                                        SizedBox(width: constraints.maxWidth * 0.10 - 1),
+                                        SizedBox(width: cardWidth, child: _buildStatCard(context, 'Rejected', rejected, Icons.cancel_outlined, AppColors.error)),
+                                      ],
+                                    );
+                                  },
+                                ),
+                              ],
+                            ).animate().fadeIn(duration: 400.ms).slideY(begin: 0.1),
+                          ),
                           
                           const SizedBox(height: 24),
                           
-                          // Filters
-                          LayoutBuilder(
-                            builder: (context, constraints) {
-                              final isMobile = MediaQuery.sizeOf(context).width < 600;
-                              final chips = AppStatuses.filterStatuses.map((filter) {
+                          // Filter Chips
+                          Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 0, vertical: 12),
+                            child: Wrap(
+                              spacing: 8,
+                              runSpacing: 8,
+                              alignment: WrapAlignment.center,
+                              children: AppStatuses.filterStatuses.map((filter) {
                                 final isSelected = _selectedFilter == filter;
-                                return AnimatedContainer(
-                                  duration: const Duration(milliseconds: 200),
-                                  padding: isMobile ? EdgeInsets.zero : const EdgeInsets.only(right: 8),
-                                  child: FilterChip(
-                                    label: Text(
-                                      filter,
-                                      style: TextStyle(
-                                        color: isSelected ? Colors.white : AppColors.textSecondary,
-                                        fontSize: isMobile ? 11 : 13,
-                                        fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
-                                      ),
-                                    ),
-                                    selected: isSelected,
-                                    onSelected: (selected) {
-                                      if (selected) setState(() => _selectedFilter = filter);
-                                    },
-                                    backgroundColor: Colors.white,
-                                    selectedColor: AppColors.primary,
-                                    showCheckmark: false,
-                                    elevation: isSelected ? 4 : 0,
-                                    pressElevation: 0,
-                                    shadowColor: AppColors.primary.withValues(alpha: 0.3),
-                                    padding: isMobile ? const EdgeInsets.symmetric(horizontal: 4, vertical: 0) : null,
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(20),
-                                      side: BorderSide(
-                                        color: isSelected ? AppColors.primary : AppColors.borderLight,
-                                        width: 1,
-                                      ),
+                                return FilterChip(
+                                  label: Text(filter),
+                                  labelStyle: GoogleFonts.poppins(
+                                    fontSize: 13,
+                                    color: isSelected ? Colors.white : AppColors.textSecondary,
+                                    fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
+                                  ),
+                                  selected: isSelected,
+                                  onSelected: (selected) {
+                                    if (selected) setState(() => _selectedFilter = filter);
+                                  },
+                                  backgroundColor: Colors.white,
+                                  selectedColor: const Color(0xFF1565C0),
+                                  selectedShadowColor: const Color(0xFF1565C0).withValues(alpha: 0.3),
+                                  showCheckmark: false,
+                                  elevation: isSelected ? 2 : 0,
+                                  pressElevation: 0,
+                                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                                  shape: StadiumBorder(
+                                    side: BorderSide(
+                                      color: isSelected ? const Color(0xFF1565C0) : const Color(0xFFDDDDDD),
                                     ),
                                   ),
                                 );
-                              }).toList();
-
-                              if (isMobile) {
-                                return Wrap(
-                                  spacing: 8,
-                                  runSpacing: 8,
-                                  children: chips,
-                                );
-                              } else {
-                                return Row(
-                                  mainAxisAlignment: MainAxisAlignment.start,
-                                  children: chips,
-                                );
-                              }
-                            },
-                          ).animate().fadeIn(duration: 400.ms, delay: 100.ms).slideX(begin: 0.1),
+                              }).toList(),
+                            ),
+                          ),
                         ],
                       ),
                     ),
@@ -194,7 +185,7 @@ class _MyComplaintsScreenState extends State<MyComplaintsScreen> {
                               _selectedFilter == 'All' 
                                   ? 'No complaints yet' 
                                   : 'No $_selectedFilter complaints',
-                              style: const TextStyle(
+                              style: GoogleFonts.poppins(
                                 fontSize: 20,
                                 fontWeight: FontWeight.w700,
                                 color: AppColors.textPrimary,
@@ -205,7 +196,7 @@ class _MyComplaintsScreenState extends State<MyComplaintsScreen> {
                               _selectedFilter == 'All'
                                   ? 'When you submit complaints, they will appear here.'
                                   : 'Try changing the filter to see other complaints.',
-                              style: const TextStyle(
+                              style: GoogleFonts.poppins(
                                 color: AppColors.textSecondary,
                                 fontSize: 14,
                               ),
@@ -220,12 +211,14 @@ class _MyComplaintsScreenState extends State<MyComplaintsScreen> {
                       sliver: SliverList(
                         delegate: SliverChildBuilderDelegate(
                           (context, index) {
-                            return ComplaintCard(
-                              complaint: filteredComplaints[index],
-                              onDelete: () => _deleteComplaint(context, filteredComplaints[index].id),
-                            ).animate()
-                             .fadeIn(duration: 400.ms, delay: (index * 50).ms)
-                             .slideY(begin: 0.1, duration: 400.ms, curve: Curves.easeOutQuad);
+                            return RepaintBoundary(
+                              child: ComplaintCard(
+                                complaint: filteredComplaints[index],
+                                onDelete: () => _deleteComplaint(context, filteredComplaints[index].id),
+                              ).animate()
+                               .fadeIn(duration: 400.ms, delay: (index * 50).ms)
+                               .slideY(begin: 0.1, duration: 400.ms, curve: Curves.easeOutQuad),
+                            );
                           },
                           childCount: filteredComplaints.length,
                         ),
@@ -241,8 +234,6 @@ class _MyComplaintsScreenState extends State<MyComplaintsScreen> {
   }
 
   Widget _buildStatCard(BuildContext context, String label, int count, IconData icon, Color color) {
-    final isMobile = MediaQuery.sizeOf(context).width < 600;
-
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 10),
       decoration: BoxDecoration(
@@ -276,8 +267,8 @@ class _MyComplaintsScreenState extends State<MyComplaintsScreen> {
             builder: (context, value, child) {
               return Text(
                 value.toInt().toString(),
-                style: TextStyle(
-                  fontSize: isMobile ? 18 : 22,
+                style: GoogleFonts.poppins(
+                  fontSize: 18,
                   fontWeight: FontWeight.w700,
                   color: color,
                   height: 1.1,
@@ -290,10 +281,10 @@ class _MyComplaintsScreenState extends State<MyComplaintsScreen> {
           const SizedBox(height: 2),
           Text(
             label,
-            style: const TextStyle(
+            style: GoogleFonts.poppins(
               fontSize: 10,
               fontWeight: FontWeight.w400,
-              color: Color(0xFF94A3B8),
+              color: const Color(0xFF94A3B8),
             ),
             maxLines: 1,
             overflow: TextOverflow.ellipsis,

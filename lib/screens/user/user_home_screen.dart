@@ -1,5 +1,10 @@
+import 'package:cached_network_image/cached_network_image.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
+import '../../main.dart';
 import '../../providers/auth_provider.dart';
 import '../../utils/constants.dart';
 import 'my_complaints_screen.dart';
@@ -24,129 +29,74 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final authProvider = context.watch<AuthProvider>();
+    final authProvider = context.watch<AppAuthProvider>();
     final user = authProvider.userModel;
 
-    final screenWidth = MediaQuery.sizeOf(context).width;
-    final isMobile = screenWidth < 600;
-    
     final String fullName = user?.name ?? '';
     final String firstName = fullName.trim().isNotEmpty ? fullName.trim().split(' ')[0] : 'there';
-    
-    final hour = DateTime.now().hour;
-    String greeting;
-    if (hour < 12) {
-      greeting = "Good Morning";
-    } else if (hour < 17) {
-      greeting = "Good Afternoon";
-    } else {
-      greeting = "Good Evening";
-    }
 
     return Scaffold(
       backgroundColor: AppColors.background,
-      appBar: PreferredSize(
-        preferredSize: Size.fromHeight(isMobile ? 56.0 : 60.0),
-        child: Container(
-          decoration: BoxDecoration(
-            gradient: const LinearGradient(
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-              colors: [Color(0xFF2563EB), Color(0xFF0EA5E9)],
-            ),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withValues(alpha: 0.1),
-                blurRadius: 4,
-                offset: const Offset(0, 1),
-              ),
-            ],
-          ),
-          child: SafeArea(
-            bottom: false,
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-              child: Row(
-                children: [
-                  // LEFT: Logo & Brand
-                  Container(
-                    width: isMobile ? 26 : 28,
-                    height: isMobile ? 26 : 28,
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(isMobile ? 7.0 : 8.0),
-                    ),
-                    child: Icon(Icons.build_rounded, color: const Color(0xFF2563EB), size: isMobile ? 14 : 16),
-                  ),
-                  const SizedBox(width: 8),
-                  Text(
-                    'FixFlow',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontWeight: FontWeight.w700,
-                      fontSize: isMobile ? 16 : 17,
-                    ),
-                  ),
-                  const Spacer(),
-                  // RIGHT: Greeting & Avatar
-                  if (isMobile) ...[
-                    Flexible(
-                      child: Text(
-                        'Hi, $firstName',
-                        style: TextStyle(
-                          color: Colors.white.withValues(alpha: 0.7),
-                          fontSize: 12,
-                          fontWeight: FontWeight.w400,
-                        ),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                    ),
-                    const SizedBox(width: 8),
-                  ] else ...[
-                    Text(
-                      '$greeting, $firstName',
-                      style: TextStyle(
-                        color: Colors.white.withValues(alpha: 0.8),
-                        fontSize: 13,
-                        fontWeight: FontWeight.w400,
-                      ),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                    const SizedBox(width: 12),
-                    Container(
-                      width: 1,
-                      height: 16,
-                      color: Colors.white.withValues(alpha: 0.3),
-                    ),
-                    const SizedBox(width: 12),
-                  ],
-                  GestureDetector(
-                    onTap: () => setState(() => _selectedIndex = 2),
-                    child: Container(
-                      padding: const EdgeInsets.all(2),
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        border: Border.all(color: Colors.white, width: isMobile ? 1.5 : 2.0),
-                      ),
-                      child: CircleAvatar(
-                        radius: isMobile ? 15 : 16,
-                        backgroundColor: Colors.white24,
-                        backgroundImage: authProvider.currentUser?.photoURL != null
-                            ? NetworkImage(authProvider.currentUser!.photoURL!)
-                            : null,
-                        child: authProvider.currentUser?.photoURL == null
-                            ? Icon(Icons.person, color: Colors.white, size: isMobile ? 16 : 18)
-                            : null,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
+      appBar: AppBar(
+        elevation: 0,
+        toolbarHeight: 60,
+        titleSpacing: 12,
+        systemOverlayStyle: SystemUiOverlayStyle.light,
+        flexibleSpace: Container(
+          decoration: const BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.centerLeft,
+              end: Alignment.centerRight,
+              colors: [Color(0xFF1565C0), Color(0xFF42A5F5)],
             ),
           ),
         ),
+        backgroundColor: Colors.transparent,
+        title: Row(
+          children: [
+            Container(
+              width: 32,
+              height: 32,
+              decoration: BoxDecoration(
+                border: Border.all(color: Colors.white, width: 1.5),
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: const Icon(Icons.build_rounded, color: Colors.white, size: 16),
+            ),
+            const SizedBox(width: 10),
+            Text(
+              'FixFlow',
+              style: GoogleFonts.poppins(
+                fontWeight: FontWeight.w700,
+                fontSize: 20,
+                color: Colors.white,
+              ),
+            ),
+          ],
+        ),
+        actions: [
+          Padding(
+            padding: const EdgeInsets.only(right: 4),
+            child: Text(
+              'Hi, $firstName',
+              style: GoogleFonts.poppins(
+                fontSize: 13,
+                color: Colors.white70,
+              ),
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.only(right: 12),
+            child: GestureDetector(
+              onTap: () => setState(() => _selectedIndex = 2),
+              child: _buildProfileAvatar(
+                safePhotoUrl(authProvider.currentUser),
+                firstName,
+                16,
+              ),
+            ),
+          ),
+        ],
       ),
       body: AnimatedSwitcher(
         duration: const Duration(milliseconds: 300),
@@ -200,6 +150,58 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
               label: 'Profile',
             ),
           ],
+        ),
+      ),
+    );
+  }
+
+  /// Builds a safe profile avatar with fallback to initials
+  Widget _buildProfileAvatar(String? photoUrl, String displayName, double radius) {
+    final initials = displayName.isNotEmpty
+        ? displayName.trim().split(' ').map((e) => e.isNotEmpty ? e[0] : '').take(2).join().toUpperCase()
+        : '?';
+
+    if (photoUrl != null && photoUrl.isNotEmpty) {
+      return Container(
+        width: radius * 2,
+        height: radius * 2,
+        decoration: BoxDecoration(
+          shape: BoxShape.circle,
+          border: Border.all(color: Colors.white, width: 2),
+          color: Colors.white24,
+        ),
+        child: ClipOval(
+          child: CachedNetworkImage(
+            imageUrl: photoUrl,
+            width: radius * 2,
+            height: radius * 2,
+            fit: BoxFit.cover,
+            errorWidget: (context, url, error) => _buildInitialsAvatar(initials, radius),
+            placeholder: (context, url) => _buildInitialsAvatar(initials, radius),
+          ),
+        ),
+      );
+    }
+    return Container(
+      width: radius * 2,
+      height: radius * 2,
+      decoration: BoxDecoration(
+        shape: BoxShape.circle,
+        border: Border.all(color: Colors.white, width: 2),
+        color: Colors.white24,
+      ),
+      child: _buildInitialsAvatar(initials, radius),
+    );
+  }
+
+  Widget _buildInitialsAvatar(String initials, double radius) {
+    return Center(
+      child: Text(
+        initials,
+        style: GoogleFonts.poppins(
+          fontSize: radius * 0.6,
+          fontWeight: FontWeight.w600,
+          color: Colors.white,
         ),
       ),
     );

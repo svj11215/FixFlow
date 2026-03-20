@@ -15,7 +15,7 @@ class FixFlowApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final authProvider = context.watch<AuthProvider>();
+    final authProvider = context.watch<AppAuthProvider>();
 
     final router = GoRouter(
       initialLocation: '/',
@@ -105,7 +105,7 @@ class FixFlowApp extends StatelessWidget {
           surface: AppColors.surface,
         ),
         scaffoldBackgroundColor: AppColors.background,
-        textTheme: GoogleFonts.interTextTheme(
+        textTheme: GoogleFonts.poppinsTextTheme(
           Theme.of(context).textTheme,
         ),
         appBarTheme: const AppBarTheme(

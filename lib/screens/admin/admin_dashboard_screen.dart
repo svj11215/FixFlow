@@ -26,7 +26,7 @@ class AdminDashboardScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final authProvider = context.read<AuthProvider>();
+    final authProvider = context.read<AppAuthProvider>();
     final adminModel = authProvider.adminModel;
     final adminId = adminModel?.adminIdString ?? '';
     final adminName = adminModel?.name ?? authProvider.currentUser?.displayName ?? 'Admin';

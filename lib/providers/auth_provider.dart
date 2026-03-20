@@ -6,7 +6,7 @@ import '../services/firestore_service.dart';
 
 enum LoginMode { none, user, admin }
 
-class AuthProvider extends ChangeNotifier {
+class AppAuthProvider extends ChangeNotifier {
   final AuthService _authService = AuthService();
   final FirestoreService _firestoreService = FirestoreService();
 
@@ -26,7 +26,7 @@ class AuthProvider extends ChangeNotifier {
   bool get isAuthenticated => _currentUser != null && _role.isNotEmpty;
   bool get isAdmin => _role == 'admin';
 
-  AuthProvider() {
+  AppAuthProvider() {
     _init();
   }
 

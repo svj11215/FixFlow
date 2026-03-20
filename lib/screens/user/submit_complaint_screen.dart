@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import '../../providers/auth_provider.dart';
@@ -27,71 +28,61 @@ class _SubmitComplaintScreenState extends State<SubmitComplaintScreen> {
   bool _isSubmitting = false;
   bool _isSuccess = false;
 
-  // Quotes data
-  static const List<Map<String, String>> _quotes = [
-    {
-      "text": "Done is better than perfect.",
-      "author": "— Mark Zuckerberg"
-    },
-    {
-      "text": "Your complaint drives real change.",
-      "author": "— FixFlow"
-    },
-    {
-      "text": "Speak up. Be heard. Get results.",
-      "author": "— FixFlow"
-    },
-    {
-      "text": "Small reports lead to big improvements.",
-      "author": "— FixFlow"
-    },
-    {
-      "text": "Silence fixes nothing. Reporting does.",
-      "author": "— FixFlow"
-    },
-    {
-      "text": "Every issue reported is progress made.",
-      "author": "— FixFlow"
-    },
+  // Motivation quotes
+  final List<Map<String, String>> motivationQuotes = [
+    {"quote": "The secret of getting ahead is getting started.", "author": "Mark Twain"},
+    {"quote": "It always seems impossible until it's done.", "author": "Nelson Mandela"},
+    {"quote": "Don't watch the clock; do what it does. Keep going.", "author": "Sam Levenson"},
+    {"quote": "Act as if what you do makes a difference. It does.", "author": "William James"},
+    {"quote": "Success is not final, failure is not fatal.", "author": "Winston Churchill"},
+    {"quote": "Believe you can and you're halfway there.", "author": "Theodore Roosevelt"},
   ];
 
+  late final PageController _pageController;
   int _currentQuoteIndex = 0;
   Timer? _quoteTimer;
 
   @override
   void initState() {
     super.initState();
+    _pageController = PageController(viewportFraction: 1.0);
     _startQuoteTimer();
   }
 
   void _startQuoteTimer() {
     _quoteTimer?.cancel();
-    _quoteTimer = Timer.periodic(const Duration(seconds: 5), (timer) {
-      if (mounted) {
-        setState(() {
-          _currentQuoteIndex = (_currentQuoteIndex + 1) % _quotes.length;
-        });
+    _quoteTimer = Timer.periodic(const Duration(seconds: 4), (timer) {
+      if (mounted && _pageController.hasClients) {
+        final nextPage = (_currentQuoteIndex + 1) % motivationQuotes.length;
+        _pageController.animateToPage(
+          nextPage,
+          duration: const Duration(milliseconds: 500),
+          curve: Curves.easeInOut,
+        );
       }
     });
   }
 
   void _nextQuote() {
-    setState(() {
-      _currentQuoteIndex = (_currentQuoteIndex + 1) % _quotes.length;
-    });
-    _startQuoteTimer(); // Reset timer on manual interaction
+    if (_pageController.hasClients) {
+      final nextPage = (_currentQuoteIndex + 1) % motivationQuotes.length;
+      _pageController.animateToPage(nextPage, duration: const Duration(milliseconds: 400), curve: Curves.easeInOut);
+    }
+    _startQuoteTimer();
   }
 
   void _prevQuote() {
-    setState(() {
-      _currentQuoteIndex = (_currentQuoteIndex - 1 + _quotes.length) % _quotes.length;
-    });
+    if (_pageController.hasClients) {
+      final prevPage = (_currentQuoteIndex - 1 + motivationQuotes.length) % motivationQuotes.length;
+      _pageController.animateToPage(prevPage, duration: const Duration(milliseconds: 400), curve: Curves.easeInOut);
+    }
     _startQuoteTimer();
   }
 
   @override
   void dispose() {
     _quoteTimer?.cancel();
+    _pageController.dispose();
     _titleController.dispose();
     _descriptionController.dispose();
     _locationController.dispose();
@@ -100,121 +91,127 @@ class _SubmitComplaintScreenState extends State<SubmitComplaintScreen> {
   }
 
   Widget _buildQuoteCard(BuildContext context) {
-    final screenWidth = MediaQuery.sizeOf(context).width;
-    final isMobile = screenWidth < 600;
-
     return Container(
       width: double.infinity,
-      height: isMobile ? 130.0 : 120.0,
-      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
+      height: 200,
       decoration: BoxDecoration(
         gradient: const LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [AppColors.gradientStart, AppColors.gradientEnd],
+          begin: Alignment.centerLeft,
+          end: Alignment.centerRight,
+          colors: [Color(0xFF1565C0), Color(0xFF42A5F5)],
         ),
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
-            color: AppColors.primary.withValues(alpha: 0.2),
+            color: const Color(0xFF1565C0).withValues(alpha: 0.3),
             blurRadius: 15,
             offset: const Offset(0, 8),
           ),
         ],
       ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+      child: Stack(
         children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const Icon(Icons.format_quote_rounded, color: Colors.white54, size: 28),
-              Row(
-                children: [
-                  IconButton(
-                    icon: const Icon(Icons.chevron_left, color: Colors.white70),
-                    onPressed: _prevQuote,
-                    padding: EdgeInsets.zero,
-                    constraints: const BoxConstraints(),
-                  ),
-                  const SizedBox(width: 8),
-                  IconButton(
-                    icon: const Icon(Icons.chevron_right, color: Colors.white70),
-                    onPressed: _nextQuote,
-                    padding: EdgeInsets.zero,
-                    constraints: const BoxConstraints(),
-                  ),
-                ],
-              ),
-            ],
-          ),
-          Expanded(
-            child: AnimatedSwitcher(
-              duration: const Duration(milliseconds: 500),
-              transitionBuilder: (Widget child, Animation<double> animation) {
-                return FadeTransition(opacity: animation, child: child);
-              },
-              child: Column(
-                key: ValueKey<int>(_currentQuoteIndex),
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text(
-                    '"${_quotes[_currentQuoteIndex]["text"]!}"',
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontSize: 15,
-                      fontStyle: FontStyle.italic,
-                      fontWeight: FontWeight.w500,
-                      height: 1.3,
-                    ),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                  const SizedBox(height: 6),
-                  Row(
-                    children: [
-                      Container(width: 20, height: 2, color: Colors.white54),
-                      const SizedBox(width: 8),
-                      Expanded(
-                        child: Text(
-                          _quotes[_currentQuoteIndex]["author"]!,
-                          style: const TextStyle(
-                            color: Colors.white70,
-                            fontSize: 12,
-                            fontWeight: FontWeight.w600,
-                          ),
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                      ),
-                    ],
-                  ),
-                ],
+          // Large decorative quote glyph
+          Positioned(
+            top: 12,
+            left: 16,
+            child: Text(
+              '\u201C',
+              style: GoogleFonts.merriweather(
+                fontSize: 48,
+                color: Colors.white24,
+                fontWeight: FontWeight.w700,
               ),
             ),
           ),
-          const SizedBox(height: 6),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: List.generate(
-              _quotes.length,
-              (index) {
-                final isActive = _currentQuoteIndex == index;
-                return AnimatedContainer(
-                  duration: const Duration(milliseconds: 200),
-                  margin: const EdgeInsets.symmetric(horizontal: 2.5),
-                  width: isActive ? 16.0 : 6.0,
-                  height: 6.0,
-                  decoration: BoxDecoration(
-                    color: isActive ? Colors.white : Colors.white.withValues(alpha: 0.4),
-                    borderRadius: BorderRadius.circular(3),
-                  ),
+          // Navigation arrows
+          Positioned(
+            top: 12,
+            right: 8,
+            child: Row(
+              children: [
+                IconButton(
+                  icon: const Icon(Icons.chevron_left, color: Colors.white, size: 24),
+                  onPressed: _prevQuote,
+                  padding: EdgeInsets.zero,
+                  constraints: const BoxConstraints(),
+                ),
+                const SizedBox(width: 4),
+                IconButton(
+                  icon: const Icon(Icons.chevron_right, color: Colors.white, size: 24),
+                  onPressed: _nextQuote,
+                  padding: EdgeInsets.zero,
+                  constraints: const BoxConstraints(),
+                ),
+              ],
+            ),
+          ),
+          // PageView for quotes
+          Padding(
+            padding: const EdgeInsets.only(top: 60, left: 20, right: 20, bottom: 40),
+            child: PageView.builder(
+              controller: _pageController,
+              itemCount: motivationQuotes.length,
+              onPageChanged: (index) {
+                setState(() => _currentQuoteIndex = index);
+              },
+              physics: const BouncingScrollPhysics(),
+              itemBuilder: (context, index) {
+                final quote = motivationQuotes[index];
+                return Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
+                      '"${quote["quote"]!}"',
+                      style: GoogleFonts.merriweather(
+                        fontSize: 15,
+                        fontStyle: FontStyle.italic,
+                        color: Colors.white,
+                        height: 1.5,
+                      ),
+                      maxLines: 3,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                    const SizedBox(height: 10),
+                    Text(
+                      '— ${quote["author"]!}',
+                      style: GoogleFonts.poppins(
+                        fontSize: 13,
+                        color: Colors.white70,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                  ],
                 );
               },
             ),
-          )
+          ),
+          // Dot indicators
+          Positioned(
+            bottom: 14,
+            left: 0,
+            right: 0,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: List.generate(
+                motivationQuotes.length,
+                (index) {
+                  final isActive = _currentQuoteIndex == index;
+                  return AnimatedContainer(
+                    duration: const Duration(milliseconds: 300),
+                    margin: const EdgeInsets.symmetric(horizontal: 3),
+                    width: isActive ? 20.0 : 8.0,
+                    height: 8.0,
+                    decoration: BoxDecoration(
+                      color: isActive ? Colors.white : Colors.white38,
+                      borderRadius: BorderRadius.circular(4),
+                    ),
+                  );
+                },
+              ),
+            ),
+          ),
         ],
       ),
     ).animate().fadeIn(duration: 600.ms).scale(begin: const Offset(0.95, 0.95));
@@ -222,64 +219,61 @@ class _SubmitComplaintScreenState extends State<SubmitComplaintScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Center(
-      child: ConstrainedBox(
-        constraints: const BoxConstraints(maxWidth: 560),
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.all(20),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Form(
-                key: _formKey,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const Text(
-                      'Submit a Complaint',
-                      style: TextStyle(
-                        fontSize: 22,
-                        fontWeight: FontWeight.w700,
-                        color: AppColors.textPrimary,
-                        letterSpacing: -0.5,
+    return SafeArea(
+      child: Center(
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: 600),
+          child: SingleChildScrollView(
+            physics: const BouncingScrollPhysics(),
+            padding: const EdgeInsets.all(20),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Form(
+                  key: _formKey,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Submit a Complaint',
+                        style: GoogleFonts.poppins(
+                          fontSize: 22,
+                          fontWeight: FontWeight.w700,
+                          color: AppColors.textPrimary,
+                          letterSpacing: -0.5,
+                        ),
                       ),
-                    ),
-                    const SizedBox(height: 4),
-                    const Text(
-                      'Fill in the details below to report an issue on campus.',
-                      style: TextStyle(
-                        fontSize: 14,
-                        color: AppColors.textSecondary,
+                      const SizedBox(height: 4),
+                      Text(
+                        'Fill in the details below to report an issue on campus.',
+                        style: GoogleFonts.poppins(
+                          fontSize: 14,
+                          color: AppColors.textSecondary,
+                        ),
                       ),
-                    ),
-                    const SizedBox(height: 24),
+                      const SizedBox(height: 24),
 
-                    // Title
-                    _buildDecoratedField(
-                      child: TextFormField(
+                      // Title
+                      TextFormField(
                         controller: _titleController,
                         maxLength: 100,
                         decoration: _inputDecoration('Complaint Title', Icons.title),
                         validator: Validators.validateTitle,
                       ),
-                    ),
-                    const SizedBox(height: 16),
+                      const SizedBox(height: 16),
 
-                    // Description
-                    _buildDecoratedField(
-                      child: TextFormField(
+                      // Description
+                      TextFormField(
                         controller: _descriptionController,
                         maxLength: 500,
                         maxLines: 4,
                         decoration: _inputDecoration('Detailed Description', Icons.description),
                         validator: Validators.validateDescription,
                       ),
-                    ),
-                    const SizedBox(height: 16),
+                      const SizedBox(height: 16),
 
-                    // Category
-                    _buildDecoratedField(
-                      child: DropdownButtonFormField<String>(
+                      // Category
+                      DropdownButtonFormField<String>(
                         initialValue: _selectedCategory,
                         decoration: _inputDecoration('Category', Icons.category_outlined),
                         icon: const Icon(Icons.keyboard_arrow_down_rounded, color: AppColors.textSecondary),
@@ -297,7 +291,7 @@ class _SubmitComplaintScreenState extends State<SubmitComplaintScreen> {
                                   ),
                                 ),
                                 const SizedBox(width: 12),
-                                Text(cat, style: const TextStyle(fontWeight: FontWeight.w500)),
+                                Text(cat, style: GoogleFonts.poppins(fontWeight: FontWeight.w500)),
                               ],
                             ),
                           );
@@ -305,22 +299,18 @@ class _SubmitComplaintScreenState extends State<SubmitComplaintScreen> {
                         onChanged: (value) => setState(() => _selectedCategory = value),
                         validator: Validators.validateCategory,
                       ),
-                    ),
-                    const SizedBox(height: 16),
+                      const SizedBox(height: 16),
 
-                    // Location
-                    _buildDecoratedField(
-                      child: TextFormField(
+                      // Location
+                      TextFormField(
                         controller: _locationController,
                         decoration: _inputDecoration('Location (e.g., Room 101, Lib)', Icons.location_on_outlined),
                         validator: Validators.validateLocation,
                       ),
-                    ),
-                    const SizedBox(height: 16),
+                      const SizedBox(height: 16),
 
-                    // Admin ID
-                    _buildDecoratedField(
-                      child: TextFormField(
+                      // Admin ID
+                      TextFormField(
                         controller: _adminIdController,
                         decoration: _inputDecoration('Admin ID (6 digits)', Icons.badge).copyWith(
                           suffixIcon: Tooltip(
@@ -335,168 +325,153 @@ class _SubmitComplaintScreenState extends State<SubmitComplaintScreen> {
                         ],
                         validator: Validators.validateAdminId,
                       ),
-                    ),
-                    const SizedBox(height: 24),
+                      const SizedBox(height: 16),
 
-                    // Image Picker - wrapped in card
-                    Container(
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(16),
-                        border: Border.all(color: AppColors.borderLight),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black.withValues(alpha: 0.02),
-                            blurRadius: 10,
-                            offset: const Offset(0, 4),
-                          ),
-                        ],
+                      // Image Picker
+                      Container(
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(20),
+                          border: Border.all(color: AppColors.borderLight),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withValues(alpha: 0.02),
+                              blurRadius: 10,
+                              offset: const Offset(0, 4),
+                            ),
+                          ],
+                        ),
+                        padding: const EdgeInsets.all(16),
+                        child: Consumer<ImageUploadProvider>(
+                          builder: (context, imageProvider, _) {
+                            return ImagePickerWidget(
+                              imageBytes: imageProvider.selectedImageBytes,
+                              isUploading: imageProvider.isUploading,
+                              onPick: () => imageProvider.pickImage(),
+                              onClear: () => imageProvider.clearImage(),
+                            );
+                          },
+                        ),
                       ),
-                      padding: const EdgeInsets.all(16),
-                      child: Consumer<ImageUploadProvider>(
-                        builder: (context, imageProvider, _) {
-                          return ImagePickerWidget(
-                            imageBytes: imageProvider.selectedImageBytes,
-                            isUploading: imageProvider.isUploading,
-                            onPick: () => imageProvider.pickImage(),
-                            onClear: () => imageProvider.clearImage(),
-                          );
-                        },
-                      ),
-                    ),
-                    const SizedBox(height: 32),
+                      const SizedBox(height: 24),
 
-                    // Submit Button
-                    AnimatedContainer(
-                      duration: const Duration(milliseconds: 300),
-                      width: double.infinity,
-                      height: 56,
-                      decoration: BoxDecoration(
-                        gradient: LinearGradient(
-                          colors: _isSuccess 
-                              ? [AppColors.secondary, AppColors.secondary]
-                              : [AppColors.gradientStart, AppColors.gradientEnd],
-                        ),
-                        borderRadius: BorderRadius.circular(16),
-                        boxShadow: [
-                          BoxShadow(
-                            color: (_isSuccess ? AppColors.secondary : AppColors.primary).withValues(alpha: 0.3),
-                            blurRadius: 12,
-                            offset: const Offset(0, 6),
+                      // Submit Button
+                      AnimatedContainer(
+                        duration: const Duration(milliseconds: 300),
+                        width: double.infinity,
+                        height: 54,
+                        decoration: BoxDecoration(
+                          gradient: LinearGradient(
+                            colors: _isSuccess
+                                ? [AppColors.secondary, AppColors.secondary]
+                                : [const Color(0xFF1565C0), const Color(0xFF42A5F5)],
                           ),
-                        ],
-                      ),
-                      child: ElevatedButton(
-                        onPressed: _isSubmitting || _isSuccess ? null : _submitComplaint,
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.transparent,
-                          shadowColor: Colors.transparent,
-                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                          borderRadius: BorderRadius.circular(16),
+                          boxShadow: [
+                            BoxShadow(
+                              color: (_isSuccess ? AppColors.secondary : const Color(0xFF1565C0)).withValues(alpha: 0.3),
+                              blurRadius: 12,
+                              offset: const Offset(0, 6),
+                            ),
+                          ],
                         ),
-                        child: AnimatedSwitcher(
-                          duration: const Duration(milliseconds: 300),
-                          child: _isSubmitting
-                              ? const SizedBox(
-                                  height: 24,
-                                  width: 24,
-                                  child: CircularProgressIndicator(strokeWidth: 2.5, color: Colors.white),
-                                )
-                              : _isSuccess
-                                  ? const Row(
-                                      mainAxisAlignment: MainAxisAlignment.center,
-                                      children: [
-                                        Icon(Icons.check_circle, color: Colors.white, size: 24),
-                                        SizedBox(width: 8),
-                                        Text(
-                                          'Submitted Successfully!',
-                                          style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white),
-                                        ),
-                                      ],
-                                    )
-                                  : const Row(
-                                      mainAxisAlignment: MainAxisAlignment.center,
-                                      children: [
-                                        Icon(Icons.rocket_launch_rounded, color: Colors.white, size: 20),
-                                        SizedBox(width: 8),
-                                        Text(
-                                          'Submit Complaint',
-                                          style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white, letterSpacing: 0.5),
-                                        ),
-                                      ],
-                                    ),
+                        child: ElevatedButton(
+                          onPressed: _isSubmitting || _isSuccess ? null : _submitComplaint,
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.transparent,
+                            shadowColor: Colors.transparent,
+                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                          ),
+                          child: AnimatedSwitcher(
+                            duration: const Duration(milliseconds: 300),
+                            child: _isSubmitting
+                                ? const SizedBox(
+                                    height: 24,
+                                    width: 24,
+                                    child: CircularProgressIndicator(strokeWidth: 2.5, color: Colors.white),
+                                  )
+                                : _isSuccess
+                                    ? Row(
+                                        mainAxisAlignment: MainAxisAlignment.center,
+                                        children: [
+                                          const Icon(Icons.check_circle, color: Colors.white, size: 24),
+                                          const SizedBox(width: 8),
+                                          Text(
+                                            'Submitted Successfully!',
+                                            style: GoogleFonts.poppins(fontSize: 16, fontWeight: FontWeight.w600, color: Colors.white),
+                                          ),
+                                        ],
+                                      )
+                                    : Row(
+                                        mainAxisAlignment: MainAxisAlignment.center,
+                                        children: [
+                                          const Icon(Icons.rocket_launch_rounded, color: Colors.white, size: 20),
+                                          const SizedBox(width: 8),
+                                          Text(
+                                            'Submit Complaint',
+                                            style: GoogleFonts.poppins(fontSize: 16, fontWeight: FontWeight.w600, color: Colors.white),
+                                          ),
+                                        ],
+                                      ),
+                          ),
                         ),
                       ),
-                    ),
-                    const SizedBox(height: 32),
-                  ]
-                      .animate(interval: 50.ms)
-                      .fade(duration: 300.ms)
-                      .slideY(begin: 0.1, duration: 300.ms, curve: Curves.easeOut),
+                      const SizedBox(height: 32),
+                    ]
+                        .animate(interval: 50.ms)
+                        .fade(duration: 300.ms)
+                        .slideY(begin: 0.1, duration: 300.ms, curve: Curves.easeOut),
+                  ),
                 ),
-              ),
-              const SizedBox(height: 24),
-              const Text(
-                'DAILY MOTIVATION',
-                style: TextStyle(
-                  fontSize: 12,
-                  fontWeight: FontWeight.w600,
-                  color: Color(0xFF94A3B8), // AppColors.textSecondary ish
-                  letterSpacing: 1.0,
+                const SizedBox(height: 24),
+                Text(
+                  'DAILY MOTIVATION',
+                  style: GoogleFonts.poppins(
+                    fontSize: 12,
+                    fontWeight: FontWeight.w600,
+                    color: const Color(0xFF94A3B8),
+                    letterSpacing: 1.0,
+                  ),
                 ),
-              ),
-              const SizedBox(height: 8),
-              _buildQuoteCard(context),
-              const SizedBox(height: 32),
-            ],
+                const SizedBox(height: 8),
+                _buildQuoteCard(context),
+                const SizedBox(height: 32),
+              ],
+            ),
           ),
         ),
       ),
     );
   }
 
-  Widget _buildDecoratedField({required Widget child}) {
-    // Focus glow handler could be added via FocusNode but to keep it simple and declarative,
-    // we use premium borders in _inputDecoration and a subtle persistent shadow.
-    return Container(
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.03),
-            blurRadius: 8,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
-      child: child,
-    );
-  }
-
   InputDecoration _inputDecoration(String label, IconData icon) {
     return InputDecoration(
       labelText: label,
-      labelStyle: const TextStyle(color: AppColors.textSecondary, fontSize: 14),
-      prefixIcon: Icon(icon, color: AppColors.primary, size: 22),
+      labelStyle: GoogleFonts.poppins(color: AppColors.textSecondary, fontSize: 14),
+      prefixIcon: Icon(icon, color: const Color(0xFF1565C0), size: 22),
       border: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(14),
         borderSide: BorderSide.none,
       ),
       enabledBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(12),
-        borderSide: BorderSide(color: AppColors.borderLight, width: 1),
+        borderRadius: BorderRadius.circular(14),
+        borderSide: BorderSide.none,
       ),
       focusedBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(12),
-        borderSide: const BorderSide(color: AppColors.primary, width: 2),
+        borderRadius: BorderRadius.circular(14),
+        borderSide: const BorderSide(color: Color(0xFF1565C0), width: 2),
       ),
       errorBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(14),
         borderSide: const BorderSide(color: AppColors.error, width: 1),
       ),
+      focusedErrorBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(14),
+        borderSide: const BorderSide(color: AppColors.error, width: 2),
+      ),
       filled: true,
-      fillColor: Colors.white,
-      contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+      fillColor: const Color(0xFFF0F4FF),
+      contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
       floatingLabelBehavior: FloatingLabelBehavior.auto,
     );
   }
@@ -504,10 +479,11 @@ class _SubmitComplaintScreenState extends State<SubmitComplaintScreen> {
   Future<void> _submitComplaint() async {
     if (!_formKey.currentState!.validate()) return;
 
+    HapticFeedback.mediumImpact();
     setState(() => _isSubmitting = true);
 
     try {
-      final authProvider = context.read<AuthProvider>();
+      final authProvider = context.read<AppAuthProvider>();
       final imageProvider = context.read<ImageUploadProvider>();
       final complaintProvider = context.read<ComplaintProvider>();
 
