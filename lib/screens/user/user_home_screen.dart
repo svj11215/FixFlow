@@ -1,12 +1,14 @@
+// [UPGRADE] user-home-theme | Theme-aware nav + AppBar | original: hardcoded colors | revert: restore old user_home_screen.dart
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import '../../main.dart';
 import '../../providers/auth_provider.dart';
-import '../../utils/constants.dart';
+import '../../core/theme/app_theme.dart';
+import 'chat_screen.dart';
 import 'my_complaints_screen.dart';
 import 'submit_complaint_screen.dart';
 import 'user_profile_screen.dart';
@@ -31,12 +33,14 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
   Widget build(BuildContext context) {
     final authProvider = context.watch<AppAuthProvider>();
     final user = authProvider.userModel;
+    final isDark = AppTheme.isDark(context);
+    final cardColor = Theme.of(context).cardColor;
 
     final String fullName = user?.name ?? '';
     final String firstName = fullName.trim().isNotEmpty ? fullName.trim().split(' ')[0] : 'there';
 
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: AppBar(
         elevation: 0,
         toolbarHeight: 60,
@@ -114,12 +118,13 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
         },
         child: _pages[_selectedIndex],
       ),
+      // [UPGRADE] theme-aware | Bottom nav colors from theme | original: Colors.white | revert: hardcode Colors.white
       bottomNavigationBar: Container(
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: cardColor,
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withValues(alpha: 0.05),
+              color: Colors.black.withValues(alpha: isDark ? 0.3 : 0.05),
               blurRadius: 10,
               offset: const Offset(0, -5),
             ),
@@ -128,34 +133,73 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
         child: NavigationBar(
           selectedIndex: _selectedIndex,
           onDestinationSelected: (index) => setState(() => _selectedIndex = index),
-          backgroundColor: Colors.white,
-          indicatorColor: AppColors.primaryLight,
+          backgroundColor: cardColor,
+          indicatorColor: AppTheme.primaryLightColor(context),
           elevation: 0,
           labelBehavior: NavigationDestinationLabelBehavior.alwaysShow,
           height: 65,
-          destinations: const [
+          destinations: [
             NavigationDestination(
-              icon: Icon(Icons.add_circle_outline, color: AppColors.textSecondary),
-              selectedIcon: Icon(Icons.add_circle, color: AppColors.primary),
+              icon: Icon(Icons.add_circle_outline, color: AppTheme.textSecondary(context)),
+              selectedIcon: Icon(Icons.add_circle, color: AppTheme.primaryColor(context)),
               label: 'Submit',
             ),
             NavigationDestination(
-              icon: Icon(Icons.list_alt_outlined, color: AppColors.textSecondary),
-              selectedIcon: Icon(Icons.list_alt, color: AppColors.primary),
+              icon: Icon(Icons.list_alt_outlined, color: AppTheme.textSecondary(context)),
+              selectedIcon: Icon(Icons.list_alt, color: AppTheme.primaryColor(context)),
               label: 'My Complaints',
             ),
             NavigationDestination(
-              icon: Icon(Icons.person_outline, color: AppColors.textSecondary),
-              selectedIcon: Icon(Icons.person, color: AppColors.primary),
+              icon: Icon(Icons.person_outline, color: AppTheme.textSecondary(context)),
+              selectedIcon: Icon(Icons.person, color: AppTheme.primaryColor(context)),
               label: 'Profile',
             ),
           ],
         ),
       ),
+      // [UPGRADE] gemini-chat | Floating AI chat button | revert: remove floatingActionButton
+      floatingActionButton: _buildChatFab(context),
     );
   }
 
-  /// Builds a safe profile avatar with fallback to initials
+  Widget _buildChatFab(BuildContext context) {
+    return FloatingActionButton(
+      heroTag: 'chat_fab',
+      onPressed: () => Navigator.of(context).push(
+        MaterialPageRoute(builder: (_) => const ChatScreen()),
+      ),
+      backgroundColor: Colors.transparent,
+      elevation: 0,
+      child: Container(
+        width: 56,
+        height: 56,
+        decoration: BoxDecoration(
+          gradient: const LinearGradient(
+            colors: [Color(0xFF1565C0), Color(0xFF42A5F5)],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          ),
+          shape: BoxShape.circle,
+          boxShadow: [
+            BoxShadow(
+              color: const Color(0xFF1565C0).withValues(alpha: 0.4),
+              blurRadius: 12,
+              offset: const Offset(0, 4),
+            ),
+          ],
+        ),
+        child: const Icon(Icons.smart_toy_rounded, color: Colors.white, size: 26),
+      ),
+    )
+        .animate()
+        .scale(
+          delay: 400.ms,
+          duration: 500.ms,
+          curve: Curves.elasticOut,
+        )
+        .fadeIn(delay: 400.ms, duration: 300.ms);
+  }
+
   Widget _buildProfileAvatar(String? photoUrl, String displayName, double radius) {
     final initials = displayName.isNotEmpty
         ? displayName.trim().split(' ').map((e) => e.isNotEmpty ? e[0] : '').take(2).join().toUpperCase()
